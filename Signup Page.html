@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth Form Demo (With Dark Mode)</title>
+  <style>
+    /* Light Theme Tokens */
+    :root {
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --background: #f8fafc;
+      --foreground: #020817;
+      --card: rgba(255, 255, 255, 0.7);
+      --card-border: #e2e8f0;
+      --muted-foreground: #64748b;
+      --destructive: #ef4444;
+      --input: #e2e8f0;
+      --input-focus: #0f172a;
+      --primary: #0f172a;
+      --primary-foreground: #f8fafc;
+      --radius: 0.5rem;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Dark Theme Tokens */
+    .dark {
+      --background: #020817;
+      --foreground: #f8fafc;
+      --card: rgba(15, 23, 42, 0.6);
+      --card-border: #1e293b;
+      --muted-foreground: #94a3b8;
+      --destructive: #f87171;
+      --input: #1e293b;
+      --input-focus: #f8fafc;
+      --primary: #f8fafc;
+      --primary-foreground: #020817;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--background);
+      color: var(--foreground);
+    }
+
+    /* Floating Theme Toggle Switch */
+    .theme-toggle-container {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+    }
+
+    .theme-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.875rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--foreground);
+      background-color: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+    }
+
+    .theme-toggle-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Screen Layout Wrapper */
+    .screen-wrapper {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 28rem;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .form-container {
+        margin-top: 0;
+      }
+    }
+
+    /* Card Styling with Backdrop Blur */
+    .card-box {
+      border-radius: 0.75rem;
+      border: 1px solid var(--card-border);
+      background-color: var(--card);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+    }
+
+    /* AuthForm Typography & Layout */
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .form-header {
+      margin-bottom: 0.5rem;
+    }
+
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
+
+    .form-subtitle {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      margin-top: 0.25rem;
+    }
+
+    /* Form Items */
+    .form-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .form-label.text-destructive {
+      color: var(--destructive);
+    }
+
+    .form-control-input {
+      display: block;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      border: 1px solid var(--input);
+      border-radius: var(--radius);
+      background-color: transparent;
+      color: var(--foreground);
+    }
+
+    .form-control-input:focus {
+      outline: 2px solid var(--input-focus);
+      outline-offset: 1px;
+    }
+
+    .form-control-input[aria-invalid="true"] {
+      border-color: var(--destructive);
+    }
+
+    .form-description {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+    }
+
+    .form-message {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--destructive);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.625rem;
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      font-weight: 500;
+      font-size: 0.875rem;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.9;
+    }
+
+    /* Footer Links */
+    .terms-text {
+      font-size: 0.75rem;
+      text-align: center;
+      color: var(--muted-foreground);
+      margin-top: 1.5rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .terms-link {
+      text-decoration: underline;
+      color: inherit;
+      transition: color 0.15s ease;
+    }
+
+    .terms-link:hover {
+      color: var(--foreground);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Centering Layout -->
+  <div class="screen-wrapper">
+
+    <!-- Theme Switcher Button -->
+    <div class="theme-toggle-container">
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-label">Dark Mode</span>
+      </button>
+    </div>
+
+    <div class="form-container">
+      
+      <!-- Card Box -->
+      <div class="card-box">
+        
+        <form class="auth-form" onsubmit="event.preventDefault();">
+          <div class="form-header">
+            <h1 class="form-title">Create an account</h1>
+            <p class="form-subtitle">Enter your email below to create your account</p>
+          </div>
+
+          <!-- Email Field -->
+          <div class="form-item">
+            <label class="form-label" for=":r0:-form-item">Email</label>
+            <input
+              id=":r0:-form-item"
+              class="form-control-input"
+              type="email"
+              placeholder="name@example.com"
+              aria-describedby=":r0:-form-item-description"
+              aria-invalid="false"
+            />
+            <p id=":r0:-form-item-description" class="form-description">
+              We will send your verification code here.
+            </p>
+          </div>
+
+          <!-- Password Field with Validation Error -->
+          <div class="form-item">
+            <label class="form-label text-destructive" for=":r1:-form-item">Password</label>
+            <input
+              id=":r1:-form-item"
+              class="form-control-input"
+              type="password"
+              aria-describedby=":r1:-form-item-description :r1:-form-item-message"
+              aria-invalid="true"
+            />
+            <p id=":r1:-form-item-message" class="form-message">
+              Password must be at least 8 characters long.
+            </p>
+          </div>
+
+          <button type="submit" class="btn-submit">Sign In</button>
+        </form>
+
+      </div>
+
+      <!-- Legal Links -->
+      <p class="terms-text">
+        By signing up, you agree to our 
+        <a href="/terms" class="terms-link">Terms of Service</a> 
+        and 
+        <a href="/privacy" class="terms-link">Privacy Policy</a>.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- Theme Switching Script -->
+  <script>
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeLabel = document.getElementById('theme-label');
+
+    // Check system preference or stored theme
+    const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const currentTheme = localStorage.getItem('theme');
+
+    if (currentTheme === 'dark' || (!currentTheme && userPrefersDark)) {
+      document.documentElement.classList.add('dark');
+      updateButtonUI(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      updateButtonUI(false);
+    }
+
+    // Toggle button event listener
+    themeToggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateButtonUI(isDark);
+    });
+
+    function updateButtonUI(isDark) {
+      themeIcon.textContent = isDark ? '☀️' : '🌙';
+      themeLabel.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+    }
+  </script>
+
+</body>
+</html>
